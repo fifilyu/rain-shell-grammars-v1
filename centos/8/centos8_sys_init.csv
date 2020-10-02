@@ -1,0 +1,32 @@
+模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
+CONST,NULL,NULL,STR,CentOS8系统初始化,NULL,TASK,设置任务名称
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
+RUN,dnf install -y iproute rsync epel-release vim-enhanced wget curl tcpdump mlocate,0,NULL,NULL,NULL,NULL,安装常用软件
+RUN,"wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-8.repo",0,NULL,NULL,NULL,NULL,配置阿里云YUM源
+RUN,"sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo",0,NULL,NULL,NULL,NULL,删除阿里云内网地址
+RUN,"sed -i 's|^#baseurl=https://download.fedoraproject.org/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*",0,NULL,NULL,NULL,NULL,启用阿里云EPEL源1
+RUN,"sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*",0,NULL,NULL,NULL,NULL,启用阿里云EPEL源1
+RUN,dnf install -y dnf-plugins-core,0,NULL,NULL,NULL,NULL,安装DNF插件
+RUN,dnf config-manager --set-enabled PowerTools,0,NULL,NULL,NULL,NULL,配置DNF插件
+RUN,dnf install -y iftop,0,NULL,NULL,NULL,NULL,从EPEL安装iftop
+RUN,dnf makecache,0,NULL,NULL,NULL,NULL,创建YUM缓存
+RUN,echo SELINUX=disabled>/etc/selinux/config,0,NULL,NULL,NULL,NULL,禁用SELINUX1
+RUN,echo SELINUXTYPE=targeted>>/etc/selinux/config,0,NULL,NULL,NULL,NULL,禁用SELINUX2
+RUN,echo '*               soft   nofile            65535' >> /etc/security/limits.conf,0,NULL,NULL,NULL,NULL,优化打开文件句柄数量1
+RUN,echo '*               hard   nofile            65535' >> /etc/security/limits.conf,0,NULL,NULL,NULL,NULL,优化打开文件句柄数量2
+RUN,sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config,0,NULL,NULL,NULL,NULL,优化SSH服务配置——禁用UseDNS
+RUN,sed -i 's/GSSAPIAuthentication yes/GSSAPIAuthentication no/' /etc/ssh/sshd_config,0,NULL,NULL,NULL,NULL,优化SSH服务配置——禁用GSSAPIAuthentication
+RUN,sed -i 's/GSSAPICleanupCredentials yes/GSSAPICleanupCredentials no/' /etc/ssh/sshd_config,0,NULL,NULL,NULL,NULL,优化SSH服务配置——禁用GSSAPICleanupCredentials
+RUN,sed -i 's/#MaxAuthTries 6/MaxAuthTries 10/' /etc/ssh/sshd_config,0,NULL,NULL,NULL,NULL,优化SSH服务配置——设置MaxAuthTries
+RUN,sed -i 's/#ClientAliveInterval 0/ClientAliveInterval 30/' /etc/ssh/sshd_config,0,NULL,NULL,NULL,NULL,优化SSH服务配置——设置客户端连接保持参数ClientAliveInterval
+RUN,sed -i 's/#ClientAliveCountMax 3/ClientAliveCountMax 10/' /etc/ssh/sshd_config,0,NULL,NULL,NULL,NULL,优化SSH服务配置——设置客户端连接保持参数ClientAliveCountMax
+RUN,systemctl restart sshd,0,NULL,NULL,NULL,NULL,重启SSH服务
+RUN,"echo 'set fencs=utf-8,gbk' >> /etc/vimrc",0,NULL,NULL,NULL,NULL,VIM支持gbk文件显示
+RUN,unlink /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime,0,NULL,NULL,NULL,NULL,设置时区
+RUN,dnf install -y systemd-timesyncd,0,NULL,NULL,NULL,NULL,时间同步systemd-timesyncd——安装软件
+RUN,systemctl enable systemd-timesyncd,0,NULL,NULL,NULL,NULL,时间同步systemd-timesyncd——启用服务
+RUN,systemctl start systemd-timesyncd,0,NULL,NULL,NULL,NULL,时间同步systemd-timesyncd——启动服务
+RUN,echo 'exclude=*.i386 *.i586 *.i686' >> /etc/yum.conf,0,NULL,NULL,NULL,NULL,禁止安装32位软件包
+RUN,systemctl stop firewalld,0,NULL,NULL,NULL,NULL,停止防火墙服务
+RUN,systemctl mask firewalld,0,NULL,NULL,NULL,NULL,禁止防火墙服务
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,结束......执行任务——${TASK}
