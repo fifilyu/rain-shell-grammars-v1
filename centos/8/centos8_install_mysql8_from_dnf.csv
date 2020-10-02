@@ -1,0 +1,45 @@
+模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
+CONST,NULL,NULL,STR,CentOS8安装MySQL8,NULL,TASK,设置任务名称
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
+CONST,NULL,NULL,STR,http://mirrors.163.com,NULL,SOURCE_URL,定义下载源URL变量
+CONST,NULL,NULL,STR,${SOURCE_URL}/mysql/Downloads/MySQL-8.0,NULL,PACKAGE_URL,定义软件包URL变量
+CONST,NULL,NULL,STR,8.0.21-1,NULL,PACKAGE_VERSION,定义软件包版本变量
+CONST,NULL,NULL,STR,/var/lib/mysql,NULL,DEFAULT_DATA_DIR,定义默认MySQL数据目录变量
+RUN,head /dev/urandom | tr -dc A-Za-z0-9 | head -c 30 ; echo '',0,NULL,NULL,NULL,DEFAULT_MYSQL_PASSWORD,生成随机MySQL密码
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,环境变量->MYSQL_DATA_DIR=${!MYSQL_DATA_DIR}
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,环境变量->MYSQL_PASSWORD=${!MYSQL_PASSWORD}
+STATEMENT,'${!MYSQL_DATA_DIR}' if '${!MYSQL_DATA_DIR}'.strip() and '${!MYSQL_DATA_DIR}'.strip() != '' else '${DEFAULT_DATA_DIR}',NULL,NULL,NULL,NULL,_MYSQL_DATA_DIR,读取环境变量MYSQL_DATA_DIR，覆盖默认MySQL数据目录变量
+STATEMENT,'${!MYSQL_PASSWORD}' if '${!MYSQL_PASSWORD}'.strip() and '${!MYSQL_PASSWORD}'.strip() != '' else '${DEFAULT_MYSQL_PASSWORD}',NULL,NULL,NULL,NULL,_MYSQL_PASSWORD,读取环境变量MYSQL_PASSWORD，覆盖默认MySQL密码
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,运行参数->_MYSQL_DATA_DIR=${_MYSQL_DATA_DIR}
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,运行参数->_MYSQL_PASSWORD=${_MYSQL_PASSWORD}
+RUN,wget https://dev.mysql.com/get/mysql80-community-release-el8-1.noarch.rpm -O /tmp/mysql80-community-release-el8-1.noarch.rpm,0,NULL,NULL,NULL,NULL,下载MySQL官方YUM源
+RUN,dnf install -y /tmp/mysql80-community-release-el8-1.noarch.rpm,0,NULL,NULL,NULL,NULL,安装MySQL官方YUM源
+RUN,dnf install -y libaio net-tools perl-interpreter perl-Getopt-Long perl-strictures,0,NULL,NULL,NULL,NULL,安装包依赖
+RUN,wget ${PACKAGE_URL}/mysql-community-client-${PACKAGE_VERSION}.el8.x86_64.rpm -O /tmp/mysql-community-client-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从国内镜像下载YUM包——mysql-community-client
+RUN,wget ${PACKAGE_URL}/mysql-community-common-${PACKAGE_VERSION}.el8.x86_64.rpm -O /tmp/mysql-community-common-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从国内镜像下载YUM包——mysql-community-common
+RUN,wget ${PACKAGE_URL}/mysql-community-devel-${PACKAGE_VERSION}.el8.x86_64.rpm -O /tmp/mysql-community-devel-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从国内镜像下载YUM包——mysql-community-devel
+RUN,wget ${PACKAGE_URL}/mysql-community-libs-${PACKAGE_VERSION}.el8.x86_64.rpm -O /tmp/mysql-community-libs-${PACKAGE_VERSION}.el8.x86_64.rpm ,0,NULL,NULL,NULL,NULL,从国内镜像下载YUM包——mysql-community-libs
+RUN,wget ${PACKAGE_URL}/mysql-community-server-${PACKAGE_VERSION}.el8.x86_64.rpm -O /tmp/mysql-community-server-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从国内镜像下载YUM包——mysql-community-server
+RUN,dnf install -y /tmp/mysql-community-common-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——mysql-community-client
+RUN,dnf install -y /tmp/mysql-community-libs-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——从国内镜像下载YUM包——mysql-community-common
+RUN,dnf install -y /tmp/mysql-community-client-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——从国内镜像下载YUM包——mysql-community-devel
+RUN,dnf install -y /tmp/mysql-community-devel-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——mysql-community-libs
+RUN,dnf install -y /tmp/mysql-community-server-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——mysql-community-server
+COPY,files/mysql8/etc/my.cnf /etc/my.cnf,NULL,NULL,NULL,NULL,NULL,从模板复制my.cnf
+RUN,mkdir -p ${_MYSQL_DATA_DIR},0,NULL,NULL,NULL,NULL,创建MySQL数据目录
+RUN,sed -i "s#datadir=/var/lib/mysql#datadir=${_MYSQL_DATA_DIR}#" /etc/my.cnf,0,NULL,NULL,NULL,NULL,替换my.cnf模板变量
+RUN,chown -R mysql:mysql ${_MYSQL_DATA_DIR},0,NULL,NULL,NULL,NULL,设置MySQL数据目录权限
+RUN,mkdir -p /var/log/mysql,0,NULL,NULL,NULL,NULL,创建MySQL日志目录
+RUN,chown -R mysql:mysql /var/log/mysql,0,NULL,NULL,NULL,NULL,设置MySQL日志目录权限
+RUN,systemctl enable mysqld,0,NULL,NULL,NULL,NULL,设置开机启动MySQL服务
+RUN,systemctl start mysqld,0,NULL,NULL,NULL,NULL,启动MySQL服务
+RUN,systemctl status mysqld,0,NULL,NULL,NULL,NULL,查看MySQL服务状态
+RUN,grep 'A temporary password' /var/log/mysql/mysqld.log|tail -n 1|awk -F': ' '{print $NF}',0,NULL,NULL,NULL,tmp_pwd,获取MySQL随机密码
+RUN,mysqladmin -uroot -p'${tmp_pwd}' password "1qaz@2wsX",0,NULL,NULL,NULL,NULL,为卸载密码策略插件，设置临时密码
+RUN,mysql -uroot -p'1qaz@2wsX' -e "UNINSTALL COMPONENT 'file://component_validate_password';",0,NULL,NULL,NULL,NULL,卸载密码策略插件
+RUN,mysqladmin -uroot -p'1qaz@2wsX' password '${_MYSQL_PASSWORD}',0,NULL,NULL,NULL,NULL,设置MySQL密码
+RUN,mysql -uroot -p'${_MYSQL_PASSWORD}' -e 'show databases;',0,NULL,NULL,NULL,NULL,测试登录
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,         MySQL密码：${_MYSQL_PASSWORD}
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,     MySQL数据目录：${_MYSQL_DATA_DIR}
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,手动设置无密码登录：mysql_config_editor set --login-path=local --host=localhost --user=root --password
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,结束......执行任务——${TASK}
