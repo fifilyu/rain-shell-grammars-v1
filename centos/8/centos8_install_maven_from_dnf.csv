@@ -1,0 +1,26 @@
+模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
+CONST,NULL,NULL,STR,CentOS8从DNF源安装Maven,NULL,TASK,设置任务名称
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
+RUN,dnf install -y maven,0,NULL,NULL,NULL,NULL,从DNF源安装Maven
+RUN,rpm -q java-11-openjdk --queryformat "%{VERSION}\n"|awk -F '.' '{print $1"."$2"."$3}',0,NULL,NULL,NULL,package_version,Java11-OpenJDK设置->获取包版本号
+RUN,alternatives --set java ${java_cmd_path},0,NULL,NULL,NULL,NULL,Java11-OpenJDK设置->A. 设置默认Java设置->java
+RUN,alternatives --display java|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_java,Java11-OpenJDK设置->A. 校验默认Java设置->java->获取参数值
+STATEMENT,'${current_config_java}'=='${java_cmd_path}',NULL,INT,1,NULL,NULL,Java11-OpenJDK设置->A. 校验默认Java设置->java->校验参数值
+RUN,java --version|head -n 1|awk '{print $2}',0,NULL,NULL,NULL,current_java_version,Java11-OpenJDK设置->A. 校验默认Java设置->java->校验版本号
+STATEMENT,'${current_java_version}'=='${package_version}',NULL,INT,1,NULL,NULL,Java11-OpenJDK设置->A. 校验默认Java设置->java->校验版本号
+RUN,alternatives --set javac ${javac_cmd_path},0,NULL,NULL,NULL,NULL,Java11-OpenJDK设置->B. 设置默认Java设置->javac
+RUN,alternatives --display javac|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_javac,Java11-OpenJDK设置->B. 校验默认Java设置->javac->获取参数值
+STATEMENT,'${current_config_javac}'=='${javac_cmd_path}',NULL,INT,1,NULL,NULL,Java11-OpenJDK设置->B. 校验默认Java设置->javac->校验参数值
+RUN,javac --version|head -n 1|awk '{print $2}',0,NULL,NULL,NULL,current_javac_version,Java11-OpenJDK设置->B. 校验默认Java设置->javac->获取版本号
+STATEMENT,'${current_javac_version}'=='${package_version}',NULL,INT,1,NULL,NULL,Java11-OpenJDK设置->B. 校验默认Java设置->javac->校验版本号
+RUN,alternatives --set jre_openjdk ${java_root_dir},0,NULL,NULL,NULL,NULL,Java11-OpenJDK设置->C. 设置默认Java设置->jre_openjdk
+RUN,alternatives --display jre_openjdk|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_jre_openjdk,Java11-OpenJDK设置->C. 校验默认Java设置->jre_openjdk->获取参数值
+STATEMENT,'${current_config_jre_openjdk}'=='${java_root_dir}',NULL,INT,1,NULL,NULL,Java11-OpenJDK设置->C. 校验默认Java设置->jre_openjdk->校验参数值
+RUN,alternatives --set java_sdk_openjdk ${java_root_dir},0,NULL,NULL,NULL,NULL,Java11-OpenJDK设置->D. 设置默认Java设置->java_sdk_openjdk
+RUN,alternatives --display java_sdk_openjdk|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_java_sdk_openjdk,Java11-OpenJDK设置->D. 校验默认Java设置->java_sdk_openjdk->获取参数值
+STATEMENT,'${current_config_java_sdk_openjdk}'=='${java_root_dir}',NULL,INT,1,NULL,NULL,Java11-OpenJDK设置->D. 校验默认Java设置->java_sdk_openjdk->校验参数值
+RUN,grep 'export JAVA_HOME=/etc/alternatives/java_sdk_openjdk' /etc/bashrc || echo 'export JAVA_HOME=/etc/alternatives/java_sdk_openjdk' >> /etc/bashrc,0,NULL,NULL,NULL,NULL,Java11-OpenJDK设置->设置环境变量JAVA_HOME->永久有效
+ENV,NULL,NULL,NULL,/etc/alternatives/java_sdk_11_openjdk,NULL,JAVA_HOME,Java11-OpenJDK设置->设置环境变量JAVA_HOME->临时有效
+RUN,"mvn --version|grep 'Java version'|awk '{print $2}'|tr -d ','",0,NULL,NULL,NULL,maven_dep_java_version,获取Maven运行时依赖的Java版本号
+STATEMENT,'${maven_dep_java_version}'=='${package_version}',NULL,INT,1,NULL,NULL,校验Maven运行时依赖的Java版本号
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,结束......执行任务——${TASK}
