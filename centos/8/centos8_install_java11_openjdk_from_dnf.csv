@@ -1,5 +1,5 @@
 模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
-CONST,NULL,NULL,STR,CentOS8安装Java11-OpenJDK,NULL,TASK,设置任务名称
+CONST,NULL,NULL,STR,CentOS8从DNF源安装Java11-OpenJDK,NULL,TASK,设置任务名称
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
 RUN,dnf install -y java-11-openjdk java-11-openjdk-devel java-11-openjdk-headless,0,NULL,NULL,NULL,NULL,安装Java11-OpenJDK
 RUN,rpm -q java-11-openjdk,0,NULL,NULL,NULL,package_info,获取Java包版本信息
