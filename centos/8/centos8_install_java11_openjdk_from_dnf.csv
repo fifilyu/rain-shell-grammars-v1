@@ -23,5 +23,5 @@ STATEMENT,'${current_config_jre_openjdk}'=='${java_root_dir}',NULL,INT,1,NULL,NU
 RUN,alternatives --set java_sdk_openjdk ${java_root_dir},0,NULL,NULL,NULL,NULL,D. 设置默认Java设置->java_sdk_openjdk
 RUN,alternatives --display java_sdk_openjdk|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_java_sdk_openjdk,D. 校验默认Java设置->java_sdk_openjdk->获取参数值
 STATEMENT,'${current_config_java_sdk_openjdk}'=='${java_root_dir}',NULL,INT,1,NULL,NULL,D. 校验默认Java设置->java_sdk_openjdk->校验参数值
-RUN,echo 'export JAVA_HOME=/etc/alternatives/java_sdk_11_openjdk' >> /etc/bashrc,0,NULL,NULL,NULL,NULL,设置环境变量JAVA_HOME
+RUN,grep 'export JAVA_HOME=/etc/alternatives/java_sdk_11_openjdk' /etc/bashrc || echo 'export JAVA_HOME=/etc/alternatives/java_sdk_11_openjdk' >> /etc/bashrc,0,NULL,NULL,NULL,NULL,设置环境变量JAVA_HOME
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,结束......执行任务——${TASK}
