@@ -1,0 +1,15 @@
+模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
+CONST,NULL,NULL,STR,CentOS8从DNF源安装Nginx,NULL,TASK,设置任务名称
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
+COPY,files/centos8_install_nginx_from_dnf/etc/yum.repos.d/nginx.repo /etc/yum.repos.d/nginx.repo,NULL,NULL,NULL,NULL,NULL,从模板复制Nginx的DNF源配置文件
+RUN,dnf install -y nginx,0,NULL,NULL,NULL,NULL,从DNF源安装Nginx
+COPY,/etc/nginx/nginx.conf /etc/nginx/nginx.conf.defaultv,NULL,NULL,NULL,NULL,NULL,备份Nginx配置文件
+COPY,files/centos8_install_nginx_from_dnf/etc/nginx/nginx.conf /etc/nginx/nginx.conf,NULL,NULL,NULL,NULL,NULL,从模板复制nginx.conf
+RUN,mkdir -p /etc/nginx/conf.d,0,NULL,NULL,NULL,NULL,创建子配置文件目录
+COPY,files/centos8_install_nginx_from_dnf/etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf,NULL,NULL,NULL,NULL,NULL,从模板复制default.conf
+RUN,nginx -t,0,NULL,NULL,NULL,NULL,检查配置
+RUN,rm -f /var/run/nginx.pid,0,NULL,NULL,NULL,NULL,删除临时文件
+RUN,systemctl start nginx,0,NULL,NULL,NULL,NULL,启动Nginx
+RUN,systemctl status nginx,0,NULL,NULL,NULL,NULL,查看Nginx状态
+RUN,systemctl enable nginx,0,NULL,NULL,NULL,NULL,设置开机启动Nginx
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,结束......执行任务——${TASK}
