@@ -25,7 +25,7 @@ RUN,dnf install -y /tmp/mysql-community-libs-${PACKAGE_VERSION}.el8.x86_64.rpm,0
 RUN,dnf install -y /tmp/mysql-community-client-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——从国内镜像下载YUM包——mysql-community-devel
 RUN,dnf install -y /tmp/mysql-community-devel-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——mysql-community-libs
 RUN,dnf install -y /tmp/mysql-community-server-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——mysql-community-server
-COPY,files/mysql8/etc/my.cnf /etc/my.cnf,NULL,NULL,NULL,NULL,NULL,从模板复制my.cnf
+COPY,files/centos8_install_mysql8_from_dnf/etc/my.cnf /etc/my.cnf,NULL,NULL,NULL,NULL,NULL,从模板复制my.cnf
 RUN,mkdir -p ${_MYSQL_DATA_DIR},0,NULL,NULL,NULL,NULL,创建MySQL数据目录
 RUN,sed -i "s#datadir=/var/lib/mysql#datadir=${_MYSQL_DATA_DIR}#" /etc/my.cnf,0,NULL,NULL,NULL,NULL,替换my.cnf模板变量
 RUN,chown -R mysql:mysql ${_MYSQL_DATA_DIR},0,NULL,NULL,NULL,NULL,设置MySQL数据目录权限
