@@ -1,5 +1,5 @@
 模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
-CONST,NULL,NULL,STR,CentOS8安装MySQL8,NULL,TASK,设置任务名称
+CONST,NULL,NULL,STR,CentOS8从DNF源安装MySQL8,NULL,TASK,设置任务名称
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
 CONST,NULL,NULL,STR,http://mirrors.163.com,NULL,SOURCE_URL,定义下载源URL变量
 CONST,NULL,NULL,STR,${SOURCE_URL}/mysql/Downloads/MySQL-8.0,NULL,PACKAGE_URL,定义软件包URL变量
