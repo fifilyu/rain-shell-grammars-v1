@@ -27,4 +27,5 @@ RUN,grep 'export JAVA_HOME=/etc/alternatives/java_sdk_openjdk' /etc/bashrc || ec
 ENV,NULL,NULL,NULL,/etc/alternatives/java_sdk_11_openjdk,NULL,JAVA_HOME,Java11-OpenJDK设置->设置环境变量JAVA_HOME->临时有效
 RUN,"mvn --version|grep 'Java version'|awk '{print $3}'|tr -d ','",0,NULL,NULL,NULL,maven_dep_java_version,获取Maven运行时依赖的Java版本号
 STATEMENT,'${maven_dep_java_version}'=='${package_version}',NULL,INT,1,NULL,NULL,校验Maven运行时依赖的Java版本号
+COPY,files/centos8_install_maven_from_dnf/usr/share/maven/conf/settings.xml /usr/share/maven/conf/settings.xml,NULL,NULL,NULL,NULL,NULL,复制Maven配置文件（Maven镜像源）
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,结束......执行任务——${TASK}
