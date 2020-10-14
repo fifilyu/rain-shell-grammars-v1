@@ -2,7 +2,7 @@
 CONST,NULL,NULL,STR,CentOS8从DNF源安装Nginx,NULL,TASK,设置任务名称
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
 COPY,files/centos8_install_nginx_from_dnf/etc/yum.repos.d/nginx.repo /etc/yum.repos.d/nginx.repo,NULL,NULL,NULL,NULL,NULL,从模板复制Nginx的DNF源配置文件
-RUN,systemctl status nginx && systemctl stop nginx,0,NULL,NULL,NULL,NULL,如果Nginx已经启动，则停止Nginx服务
+RUN,systemctl is-active nginx && systemctl stop nginx,0,NULL,NULL,NULL,NULL,如果Nginx已经启动，则停止Nginx服务
 RUN,dnf install -y nginx,0,NULL,NULL,NULL,NULL,从DNF源安装Nginx
 COPY,/etc/nginx/nginx.conf /etc/nginx/nginx.conf.defaultv,NULL,NULL,NULL,NULL,NULL,备份Nginx配置文件
 COPY,files/centos8_install_nginx_from_dnf/etc/nginx/nginx.conf /etc/nginx/nginx.conf,NULL,NULL,NULL,NULL,NULL,从模板复制nginx.conf
