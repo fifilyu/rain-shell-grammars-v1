@@ -6,7 +6,7 @@ RUN,rpm -q java-11-openjdk,0,NULL,NULL,NULL,package_info,获取Java包版本信�
 CONST,NULL,NULL,STR,/usr/lib/jvm/${package_info},NULL,java_root_dir,获取Java根目录路径
 CONST,NULL,NULL,STR,${java_root_dir}/bin/java,NULL,java_cmd_path,获取java命令路径
 CONST,NULL,NULL,STR,${java_root_dir}/bin/javac,NULL,javac_cmd_path,获取javac命令路径
-RUN,rpm -q java-11-openjdk --queryformat "%{VERSION}\n"|awk -F '.' '{print $1"."$2"."$3}',0,NULL,NULL,NULL,package_version,获取包版本号
+RUN,"rpm -q java-11-openjdk --queryformat ""%{VERSION}\n""|awk -F '.' '{print $1"".""$2"".""$3}'",0,NULL,NULL,NULL,package_version,获取包版本号
 RUN,alternatives --set java ${java_cmd_path},0,NULL,NULL,NULL,NULL,A. 设置默认Java设置->java
 RUN,alternatives --display java|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_java,A. 校验默认Java设置->java->获取参数值
 STATEMENT,'${current_config_java}'=='${java_cmd_path}',NULL,INT,1,NULL,NULL,A. 校验默认Java设置->java->校验参数值
