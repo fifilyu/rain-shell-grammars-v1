@@ -35,8 +35,8 @@ RUN,systemctl enable mysqld,0,NULL,NULL,NULL,NULL,设置开机启动MySQL服务
 RUN,systemctl start mysqld,0,NULL,NULL,NULL,NULL,启动MySQL服务
 RUN,systemctl status mysqld,0,NULL,NULL,NULL,NULL,查看MySQL服务状态
 RUN,grep 'A temporary password' /var/log/mysql/mysqld.log|tail -n 1|awk -F': ' '{print $NF}',0,NULL,NULL,NULL,tmp_pwd,获取MySQL随机密码
-RUN,mysqladmin -uroot -p'${tmp_pwd}' password "1qaz@2wsX",0,NULL,NULL,NULL,NULL,为卸载密码策略插件，设置临时密码
-RUN,mysql -uroot -p'1qaz@2wsX' -e "UNINSTALL COMPONENT 'file://component_validate_password';",0,NULL,NULL,NULL,NULL,卸载密码策略插件
+RUN,"mysqladmin -uroot -p'${tmp_pwd}' password ""1qaz@2wsX""",0,NULL,NULL,NULL,NULL,为卸载密码策略插件，设置临时密码
+RUN,"mysql -uroot -p'1qaz@2wsX' -e ""UNINSTALL COMPONENT 'file://component_validate_password';""",0,NULL,NULL,NULL,NULL,卸载密码策略插件
 RUN,mysqladmin -uroot -p'1qaz@2wsX' password '${_MYSQL_PASSWORD}',0,NULL,NULL,NULL,NULL,设置MySQL密码
 RUN,mysql -uroot -p'${_MYSQL_PASSWORD}' -e 'show databases;',0,NULL,NULL,NULL,NULL,测试登录
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,         MySQL密码：${_MYSQL_PASSWORD}

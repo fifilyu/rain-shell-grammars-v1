@@ -10,12 +10,12 @@ RUN,"rpm -q java-11-openjdk --queryformat ""%{VERSION}\n""|awk -F '.' '{print $1
 RUN,alternatives --set java ${java_cmd_path},0,NULL,NULL,NULL,NULL,A. 设置默认Java设置->java
 RUN,alternatives --display java|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_java,A. 校验默认Java设置->java->获取参数值
 STATEMENT,'${current_config_java}'=='${java_cmd_path}',NULL,INT,1,NULL,NULL,A. 校验默认Java设置->java->校验参数值
-RUN,java --version|head -n 1|awk '{print $2}'|awk -F '.' '{print $1"."$2"."$3}',0,NULL,NULL,NULL,current_java_version,A. 校验默认Java设置->java->获取版本号
+RUN,"java --version|head -n 1|awk '{print $2}'|awk -F '.' '{print $1"".""$2"".""$3}'",0,NULL,NULL,NULL,current_java_version,A. 校验默认Java设置->java->获取版本号
 STATEMENT,'${current_java_version}'=='${package_version}',NULL,INT,1,NULL,NULL,A. 校验默认Java设置->java->校验版本号
 RUN,alternatives --set javac ${javac_cmd_path},0,NULL,NULL,NULL,NULL,B. 设置默认Java设置->javac
 RUN,alternatives --display javac|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_javac,B. 校验默认Java设置->javac->获取参数值
 STATEMENT,'${current_config_javac}'=='${javac_cmd_path}',NULL,INT,1,NULL,NULL,B. 校验默认Java设置->javac->校验参数值
-RUN,javac --version|head -n 1|awk '{print $2}'|awk -F '.' '{print $1"."$2"."$3}',0,NULL,NULL,NULL,current_javac_version,B. 校验默认Java设置->javac->获取版本号
+RUN,"javac --version|head -n 1|awk '{print $2}'|awk -F '.' '{print $1"".""$2"".""$3}'",0,NULL,NULL,NULL,current_javac_version,B. 校验默认Java设置->javac->获取版本号
 STATEMENT,'${current_javac_version}'=='${package_version}',NULL,INT,1,NULL,NULL,B. 校验默认Java设置->javac->校验版本号
 RUN,alternatives --set jre_openjdk ${java_root_dir},0,NULL,NULL,NULL,NULL,C. 设置默认Java设置->jre_openjdk
 RUN,alternatives --display jre_openjdk|grep 'link currently points to'|sed 's/link currently points to//'|awk '{print $NF}',0,NULL,NULL,NULL,current_config_jre_openjdk,C. 校验默认Java设置->jre_openjdk->获取参数值
