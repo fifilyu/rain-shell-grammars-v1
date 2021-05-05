@@ -1,0 +1,18 @@
+模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
+CONST,NULL,NULL,STR,CentOS8安装Nginx,NULL,TASK,设置任务名称
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
+RUN,rpm -qa|grep nginx && dnf remove -y nginx*,NULL,NULL,NULL,NULL,NULL,卸载旧版本Nginx及其模块
+COPY,files/nginx/etc/yum.repos.d/nginx.repo /etc/yum.repos.d/nginx.repo,NULL,NULL,NULL,NULL,NULL,从模板复制nginx.repo
+RUN,dnf install -y nginx,0,NULL,NULL,NULL,NULL,安装Nginx
+RUN,dnf install -y nginx-module-image-filter nginx-module-njs nginx-module-perl nginx-module-xslt,0,NULL,NULL,NULL,NULL,安装Nginx模块
+RUN,nginx -v,0,NULL,NULL,NULL,NULL,查看Nginx版本
+COPY,/etc/nginx/nginx.conf /etc/nginx/nginx.conf.defaultv,NULL,NULL,NULL,NULL,NULL,备份nginx.conf
+COPY,files/nginx/etc/nginx/nginx.conf /etc/nginx/nginx.conf,NULL,NULL,NULL,NULL,NULL,从模板复制nginx.conf
+RUN,mkdir -p /etc/nginx/conf.d,0,NULL,NULL,NULL,NULL,创建Nginx配置文件目录/etc/nginx/conf.d
+COPY,files/nginx/etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf,NULL,NULL,NULL,NULL,NULL,从模板复制default.conf
+RUN,nginx -t,0,NULL,NULL,NULL,NULL,检查Nginx配置
+RUN,rm -f /var/run/nginx.pid,0,NULL,NULL,NULL,NULL,删除临时文件
+RUN,systemctl enable nginx,0,NULL,NULL,NULL,NULL,设置Nginx服务开机启动
+RUN,systemctl start nginx,0,NULL,NULL,NULL,NULL,启动Nginx服务
+RUN,systemctl status nginx,0,NULL,NULL,NULL,NULL,查看Nginx服务状态
+MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,结束......执行任务——${TASK}
