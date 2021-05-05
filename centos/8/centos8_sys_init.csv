@@ -4,6 +4,7 @@ MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
 RUN,dnf install -y iproute rsync epel-release vim-enhanced wget curl tcpdump mlocate strace,0,NULL,NULL,NULL,NULL,安装常用软件
 RUN,"wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-8.repo",0,NULL,NULL,NULL,NULL,配置阿里云YUM源
 RUN,"sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo",0,NULL,NULL,NULL,NULL,删除阿里云内网地址
+RUN,dnf update -y,0,NULL,NULL,NULL,NULL,更新系统
 RUN,"sed -i 's|^#baseurl=https://download.fedoraproject.org/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*",0,NULL,NULL,NULL,NULL,启用阿里云EPEL源1
 RUN,"sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*",0,NULL,NULL,NULL,NULL,启用阿里云EPEL源1
 RUN,dnf install -y dnf-plugins-core,0,NULL,NULL,NULL,NULL,安装DNF插件

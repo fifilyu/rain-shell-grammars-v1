@@ -1,5 +1,5 @@
 模式,表达式,返回代码,返回类型,返回值,过滤器,变量名,提示信息
-CONST,NULL,NULL,STR,CentOS8安装MySQL8,NULL,TASK,设置任务名称
+CONST,NULL,NULL,STR,CentOS8从DNF源安装MySQL8,NULL,TASK,设置任务名称
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,开始......执行任务——${TASK}
 CONST,NULL,NULL,STR,http://mirrors.163.com,NULL,SOURCE_URL,定义下载源URL变量
 CONST,NULL,NULL,STR,${SOURCE_URL}/mysql/Downloads/MySQL-8.0,NULL,PACKAGE_URL,定义软件包URL变量
@@ -25,9 +25,9 @@ RUN,dnf install -y /tmp/mysql-community-libs-${PACKAGE_VERSION}.el8.x86_64.rpm,0
 RUN,dnf install -y /tmp/mysql-community-client-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——从国内镜像下载YUM包——mysql-community-devel
 RUN,dnf install -y /tmp/mysql-community-devel-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——mysql-community-libs
 RUN,dnf install -y /tmp/mysql-community-server-${PACKAGE_VERSION}.el8.x86_64.rpm,0,NULL,NULL,NULL,NULL,从本地安装YUM包——mysql-community-server
-COPY,files/mysql8/etc/my.cnf /etc/my.cnf,NULL,NULL,NULL,NULL,NULL,从模板复制my.cnf
+COPY,files/centos8_install_mysql8_from_dnf/etc/my.cnf /etc/my.cnf,NULL,NULL,NULL,NULL,NULL,从模板复制my.cnf
 RUN,mkdir -p ${_MYSQL_DATA_DIR},0,NULL,NULL,NULL,NULL,创建MySQL数据目录
-RUN,sed -i "s#datadir=/var/lib/mysql#datadir=${_MYSQL_DATA_DIR}#" /etc/my.cnf,0,NULL,NULL,NULL,NULL,替换my.cnf模板变量
+RUN,"sed -i ""s#datadir=/var/lib/mysql#datadir=${_MYSQL_DATA_DIR}#"" /etc/my.cnf",0,NULL,NULL,NULL,NULL,替换my.cnf模板变量
 RUN,chown -R mysql:mysql ${_MYSQL_DATA_DIR},0,NULL,NULL,NULL,NULL,设置MySQL数据目录权限
 RUN,mkdir -p /var/log/mysql,0,NULL,NULL,NULL,NULL,创建MySQL日志目录
 RUN,chown -R mysql:mysql /var/log/mysql,0,NULL,NULL,NULL,NULL,设置MySQL日志目录权限
@@ -35,8 +35,8 @@ RUN,systemctl enable mysqld,0,NULL,NULL,NULL,NULL,设置开机启动MySQL服务
 RUN,systemctl start mysqld,0,NULL,NULL,NULL,NULL,启动MySQL服务
 RUN,systemctl status mysqld,0,NULL,NULL,NULL,NULL,查看MySQL服务状态
 RUN,grep 'A temporary password' /var/log/mysql/mysqld.log|tail -n 1|awk -F': ' '{print $NF}',0,NULL,NULL,NULL,tmp_pwd,获取MySQL随机密码
-RUN,mysqladmin -uroot -p'${tmp_pwd}' password "1qaz@2wsX",0,NULL,NULL,NULL,NULL,为卸载密码策略插件，设置临时密码
-RUN,mysql -uroot -p'1qaz@2wsX' -e "UNINSTALL COMPONENT 'file://component_validate_password';",0,NULL,NULL,NULL,NULL,卸载密码策略插件
+RUN,"mysqladmin -uroot -p'${tmp_pwd}' password ""1qaz@2wsX""",0,NULL,NULL,NULL,NULL,为卸载密码策略插件，设置临时密码
+RUN,"mysql -uroot -p'1qaz@2wsX' -e ""UNINSTALL COMPONENT 'file://component_validate_password';""",0,NULL,NULL,NULL,NULL,卸载密码策略插件
 RUN,mysqladmin -uroot -p'1qaz@2wsX' password '${_MYSQL_PASSWORD}',0,NULL,NULL,NULL,NULL,设置MySQL密码
 RUN,mysql -uroot -p'${_MYSQL_PASSWORD}' -e 'show databases;',0,NULL,NULL,NULL,NULL,测试登录
 MESSAGE,NULL,NULL,NULL,NULL,NULL,NULL,         MySQL密码：${_MYSQL_PASSWORD}
